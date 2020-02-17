@@ -113,41 +113,6 @@ class MaxEntIRL:
 
 
 
-        # robot_state_utils = RobotStateUtils()
-        # rewards, state_space_model_features, n_features = robot_state_utils.calculate_optimal_policy_func(alpha, discount)
-        # # policy = find_policy(n_states, r, n_actions, discount, transition_probability)
-        # policy = find_policy(n_states, 8, rewards, discount)
-        # # print "state space model features ", state_space_model_features
-        # model_state_val_x, model_state_val_y, model_state_val_z, index_val_x, index_val_y, index_val_z = robot_state_utils.return_model_state_values()
-        # mu = np.exp(-model_state_val_x ** 2) * np.exp(-model_state_val_y ** 2) * np.exp(-model_state_val_z ** 2)
-        # action_set = robot_state_utils.return_action_set()
-        # mu_reshape = np.reshape(mu, [11 * 11 * 11, 1])
-        # mu = mu / sum(mu_reshape)
-        # mu_last = mu
-        # # print "Initial State Frequency calculated..."
-        # for time in range(0, self.trajectory_length):
-        #     s = np.zeros([11, 11, 11])
-        #     for act_index, action in enumerate(action_set):
-        #         new_state_val_x, new_state_val_y, new_state_val_z = robot_state_utils.get_next_state(model_state_val_x, model_state_val_y, model_state_val_z, action)
-        #
-        #         new_index_val_x, new_index_val_y, new_index_val_z = robot_state_utils.get_indices(new_state_val_x, new_state_val_y, new_state_val_z)
-        #
-        #         p = policy[act_index, index_val_x, index_val_y, index_val_z]
-        #         s = s + p * mu_last[new_index_val_x, new_index_val_y, new_index_val_z]
-        #     mu_last = s
-        #     mu = mu + mu_last
-        # mu = mu / self.trajectory_length
-        # # mu = mu / n_time
-        # state_visitation = mu_last * state_space_model_features
-        # # print "State Visitation Frequency calculated."
-        # return np.sum(state_visitation.reshape(n_features, 11 * 11 * 11), axis=1), policy, n_features
-        # # return mu_last, policy, state_space_model_features
-        # # state_visitation = mu_last * self.f
-        # # print "State Visitation Frequency calculated."
-        # # return np.sum(state_visitation.reshape(2, 11 * 11 * 11), axis=1), policy
-
-
-
 
 
 

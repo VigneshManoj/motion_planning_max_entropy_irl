@@ -40,7 +40,6 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         self.values_tmp = np.zeros([self.n_states])
 
 
-
     def create_state_space_model_func(self):
         # Creates the state space of the robot based on the values initialized for linspace by the user
         # print "Creating State space "
@@ -102,7 +101,7 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
             # If there are no issues with the new state value then return false, negation is present on the other end
             return False
     #
-    def reward_func(self, end_pos_x, end_pos_y, weights):
+    def reward_func(self, end_pos_x, end_pos_y):
         # Creates list of all the features being considered
         features = [self.features_array_prim_func, self.features_array_sec_func]
         reward = 0
@@ -118,17 +117,6 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
 
         return reward, features_arr
 
-    # def reward_func(self, end_pos_x, end_pos_y, alpha):
-    #     # Creates list of all the features being considered
-    #
-    #     # reward = -1
-    #     if self.is_terminal_state([end_pos_x, end_pos_y]):
-    #         reward = 0
-    #     else:
-    #         reward = -1
-    #
-    #     return reward, 1
-
     # Created feature set1 which basically takes the exponential of sum of individually squared value
     def features_array_prim_func(self, end_pos_x, end_pos_y):
         feature_1 = np.exp(-(end_pos_x**2))
@@ -139,16 +127,7 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         feature_2 = np.exp(-(end_pos_y**2))
         # print f2
         return feature_2
-    '''
-    # Created feature set3 which basically takes the exponential of sum of individually squared value
-    def features_array_tert_func(self, end_pos_x, end_pos_y, end_pos_z):
-        feature_3 = np.exp(-(end_pos_z**2))
-        return feature_3
 
-    def features_array_sum_func(self, end_pos_x, end_pos_y, end_pos_z):
-        feature_4 = np.exp(-(end_pos_x**2 + end_pos_y**2 + end_pos_z**2))
-        return feature_4
-    '''
     def reset(self):
         self.pos = np.random.randint(0, len(self.states))
         self.grid = np.zeros((self.grid_size, self.grid_size))
@@ -165,7 +144,7 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         # print "resulting state is ", resulting_state
         # Calculates the reward and returns the reward value, features value and
         # number of features based on the features provided
-        reward, features_arr = self.reward_func(resulting_state[0], resulting_state[1], self.weights)
+        reward, features_arr = self.reward_func(resulting_state[0], resulting_state[1])
         # print "reward is ", reward
         # Checks if the resulting state is moving it out of the grid
         resulting_state_index = self.get_state_val_index(resulting_state)
@@ -179,16 +158,7 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
     def action_space_sample(self):
         # print "random action choice ", np.random.randint(0, len(self.action_space))
         return np.random.randint(0, len(self.action_space))
-    '''
-    def features_func(self, end_pos_x, end_pos_y):
 
-        features = [self.features_array_prim_func, self.features_array_sec_func, self.features_array_tert_func]
-        features_arr = []
-        for n in range(0, len(features)):
-            features_arr.append(features[n](end_pos_x, end_pos_y, end_pos_z))
-        # Created the feature function assuming everything has importance, so therefore added each parameter value
-        return features_arr
-    '''
     def get_transition_states_and_probs(self, curr_state, action):
 
         if self.is_terminal_state(curr_state):
@@ -288,68 +258,6 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
                                     for pre_s in range(self.n_states)])
         p = np.sum(mu, 1)
         return p
-
-    '''
-if __name__ == '__main__':
-    # Robot Object called
-    # Pass the gridsize required
-    weights = np.array([[1, 1, 0]])
-    # term_state = np.random.randint(0, grid_size ** 3)]
-    env_obj = RobotStateUtils(11, weights, 0.9, [0.5, 0.5, 0])
-    states = env_obj.create_state_space_model_func()
-    action = env_obj.create_action_set_func()
-    # print "State space created is ", states
-    P_a = env_obj.get_transition_mat_deterministic()
-    # print "P_a is ", P_a
-    print "shape of P_a ", P_a.shape
-    rewards = []
-    features = []
-    for i in range(len(states)):
-        r, f = env_obj.reward_func(states[i][0], states[i][1], states[i][2], weights)
-        rewards.append(r)
-        features.append(f)
-    # print "rewards is ", rewards
-    value, policy = env_obj.value_iteration(rewards)
-    # policy = np.random.randint(27, size=1331)
-    print "policy is ", policy
-    print "features is ", features
-    # feat = np.array([features]).transpose().reshape((len(features[0]), len(features)))
-    # print "features shape is ", feat.shape
-    '''
-    '''
-    robot_mdp = RobotMarkovModel()
-    # Finds the sum of features of the expert trajectory and list of all the features of the expert trajectory
-    sum_trajectory_features, feature_array_all_trajectories = robot_mdp.generate_trajectories()
-    svf = env_obj.compute_state_visitation_frequency(P_a, feature_array_all_trajectories, policy)
-    print "svf is ", svf
-    print "svf shape is ", svf.shape
-
-    print "expected svf is ", feat.dot(svf).reshape(3, 1)
-    
-    
-    # x = [-0.5, 0.2, 0.4]
-    # row_column = obj_state_util.get_state_val_index(x)
-    # print "index val", row_column, x
-    # state_check = row_column
-    # action_val = 15
-    # print "Current state index ", obj_state_util.states[state_check]
-    # r = obj_state_util.step(state_check, action_val)
-    # print "r is ", r
-    policy, state_traj, expected_svf = q_learning(env_obj, weights, alpha=0.1, gamma=0.9, epsilon=0.2)
-    print "best policy is ", policy
-    policy_val = []
-    for i in range(len(policy)):
-        policy_val.append(policy[i]/float(sum(policy)))
-    print "policy val is ", policy_val
-    # print "state traj", state_traj
-    # print "rewards ", rewards
-    # P_a = env_obj.get_transition_mat_deterministic()
-    # print "prob is ", P_a
-    # print "prob shape is ", P_a.shape
-    # print "prob value is ", P_a[0]
-    print "Expected svf is ", expected_svf
-    '''
-
 
 
 
