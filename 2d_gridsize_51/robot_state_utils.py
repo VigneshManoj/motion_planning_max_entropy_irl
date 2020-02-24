@@ -1,15 +1,11 @@
 import numpy as np
-import numba as nb
-import math
 import concurrent.futures
-from robot_markov_model import RobotMarkovModel
-import numpy.random as rn
 # from pytictoc import TicToc
 
 
 class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
     def __init__(self, grid_size, discount, terminal_state_val_from_trajectory):
-        super(RobotStateUtils, self).__init__(max_workers=8)
+        super(RobotStateUtils, self).__init__(max_workers=16)
         # Model here means the 3D cube being created
         # linspace limit values: limit_values_pos = [[-0.009, -0.003], [0.003, 007], [-0.014, -0.008]]
         # Creates the model state space based on the maximum and minimum values of the dataset provided by the user
@@ -17,7 +13,7 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         # The value 11 etc decides how sparse the mesh size of the cube would be
         self.grid_size = grid_size
         self.grid = np.zeros((self.grid_size, self.grid_size, self.grid_size))
-        self.lin_space_limits = np.linspace(-5, 5, self.grid_size, dtype='float32')
+        self.lin_space_limits = np.linspace(-25, 25, self.grid_size, dtype='float32')
         # Creates a dictionary for storing the state values
         self.states = {}
         # Creates a dictionary for storing the action values
@@ -70,8 +66,8 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
 
     # To convert a state value array into index values
     def get_state_val_index(self, state_val):
-        index_val = abs((state_val[0] + 5) * pow(self.grid_size, 1)) + \
-                    abs((state_val[1] + 5) * pow(self.grid_size, 0))
+        index_val = abs((state_val[0] + 25) * pow(self.grid_size, 1)) + \
+                    abs((state_val[1] + 25) * pow(self.grid_size, 0))
         # Returns the index value
         return int(index_val)
 
@@ -259,6 +255,20 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         p = np.sum(mu, 1)
         return p
 
+
+if __name__ == '__main__':
+    grid_size = 51
+    terminal_state_val_from_trajectory = np.array([0., 1.0])
+    obj = RobotStateUtils(grid_size, 0.9, terminal_state_val_from_trajectory)
+    states = obj.create_state_space_model_func()
+    actions = obj.create_action_set_func()
+    print "states is ", states
+    print "size of states ", len(states)
+    print "actions is ", actions
+    # print "len state s", len(s[0])
+    print "states val ", states[26]
+    index_val = obj.get_state_val_index(states[26])
+    print "index val calculated is ", index_val
 
 
 

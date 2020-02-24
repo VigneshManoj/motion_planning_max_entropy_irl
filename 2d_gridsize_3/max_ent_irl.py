@@ -1,6 +1,6 @@
 import numpy as np
-import numpy.random as rn
-import math
+from numpy import savetxt
+
 from robot_markov_model import RobotMarkovModel
 from robot_state_utils import RobotStateUtils
 
@@ -13,7 +13,7 @@ class MaxEntIRL:
         self.grid_size = grid_size
 
     # Calculates the reward function weights using the Max Entropy Algorithm
-    def max_ent_irl(self, trajectories, discount, n_trajectories, epochs, learning_rate):
+    def max_ent_irl(self, trajectories, discount, n_trajectories, epochs, learning_rate, filename):
         # Finds the total number of states and dimensions of the list of features array
         # 0 indicates that the first trajectory data is being used
         total_states = len(trajectories[0])
@@ -41,6 +41,10 @@ class MaxEntIRL:
             if i % 25 == 0:
                 print "Epoch running is ", i
                 print "weights is ", weights
+                file_open = open(filename, 'a')
+                savetxt(filename, weights, delimiter=',', fmt="%10.5f", newline=", ")
+                file_open.write("\n \n \n \n ")
+                file_open.close()
             reward = np.dot(feat_map, weights)
             optimal_policy, expected_svf = self.find_expected_svf(weights, discount, total_states, trajectories, reward)
             # Computes the gradient
