@@ -301,6 +301,8 @@ if __name__ == '__main__':
     print "actions is ", action
     index_val = env_obj.get_state_val_index([5, -5, 0])
     print "index val is ", index_val
+    P_a = env_obj.get_transition_mat_deterministic()
+
     '''
     # Robot Object called
     # Pass the gridsize required
