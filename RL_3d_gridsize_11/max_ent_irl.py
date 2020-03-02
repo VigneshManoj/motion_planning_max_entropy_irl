@@ -27,8 +27,8 @@ class MaxEntIRL:
         action = env_obj.create_action_set_func()
         print "states is ", states
         print "action are ", action
-	filename = "/home/vvarier/dvrk_automated_suturing/max_ent_trial4_parallel_compute_grid_size/trial4_grid11_parallel/weights_grid11.txt"
-	# Creates the feature matrix for the given robot environment
+        filename = "/home/vvarier/dvrk_automated_suturing/max_ent_trial4_parallel_compute_grid_size/trial4_grid11_parallel/weights_grid11.txt"
+        # Creates the feature matrix for the given robot environment
         # Currently a identity feature matrix is being used
         feat_map = np.eye(self.grid_size ** 3)
         # feat_map = env_obj.get_feature_matrix()
@@ -42,10 +42,10 @@ class MaxEntIRL:
             if i % 20 == 0:
                 print "Epoch running is ", i
                 print "weights is ", weights
-	        file_open = open(filename, 'a')
-		savetxt(file_open, weights, delimiter=',', fmt="%10.5f", newline=", ")
-		file_open.write("\n \n \n \n")
-		file_open.close()
+                file_open = open(filename, 'a')
+                savetxt(file_open, weights, delimiter=',', fmt="%10.5f", newline=", ")
+                file_open.write("\n \n \n \n")
+                file_open.close()
             reward = np.dot(feat_map, weights)
             optimal_policy, expected_svf = self.find_expected_svf(weights, discount, total_states, trajectories, reward)
             # Computes the gradient
