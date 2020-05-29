@@ -11,8 +11,8 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         # It is for created a 3D cube with 3 values specifying each cube node
         # The value 11 etc decides how sparse the mesh size of the cube would be
         self.grid_size = grid_size
-        self.lin_space_limits_x = np.linspace(-0.025, 0.025, self.grid_size, dtype='float32')
-        self.lin_space_limits_y = np.linspace(0.03, 0.08, self.grid_size, dtype='float32')
+        self.lin_space_limits_x = np.linspace(-0.03, 0.02, self.grid_size, dtype='float32')
+        self.lin_space_limits_y = np.linspace(0.025, 0.075, self.grid_size, dtype='float32')
         self.lin_space_limits_z = np.linspace(-0.14, -0.09, self.grid_size, dtype='float32')
 
         # Creates a dictionary for storing the state values
@@ -31,8 +31,8 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         self.n_actions = 27
         self.gamma = discount
 
-        self.rewards = []
-        self.P_a = np.zeros((self.n_states, self.n_actions, self.n_states), dtype=np.int32)
+        self.rewards = np.zeros([self.n_states])
+        # self.P_a = np.zeros((self.n_states, self.n_actions, self.n_states), dtype=np.int32)
         self.values_tmp = np.zeros([self.n_states])
 
     def create_state_space_model_func(self):
@@ -66,8 +66,8 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         return self.action_space
 
     def get_state_val_index(self, state_val):
-        index_val = abs((state_val[0] + 0.025) / 0.005 * pow(self.grid_size, 2)) + \
-                    abs((state_val[1] - 0.03) / 0.005 * pow(self.grid_size, 1)) + \
+        index_val = abs((state_val[0] + 0.03) / 0.005 * pow(self.grid_size, 2)) + \
+                    abs((state_val[1] - 0.025) / 0.005 * pow(self.grid_size, 1)) + \
                     abs((state_val[2] + 0.14) / 0.005)
         return int(round(index_val))
 
@@ -86,8 +86,10 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
     def off_grid_move(self, new_state, old_state):
 
         # Checks if the new state exists in the state space
-        if new_state not in self.states.values():
-            # print "reaching inside grid"
+        sum_feat = np.zeros(len(self.states))
+        for i, ele in enumerate(self.states.values()):
+            sum_feat[i] = np.all(np.equal(ele, new_state))
+        if np.sum(sum_feat) == 0:
             return True
         # if trying to wrap around the grid, also the reason for the for x in _ is because old_state is a list
         elif (x % self.grid_size for x in old_state) == 0 and (y % self.grid_size for y in
@@ -110,7 +112,7 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         if self.is_terminal_state(state):
             reward = 10
         else:
-            reward = -1
+            reward = 0
 
         return reward
 
@@ -218,15 +220,18 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
                     # Prob of si to sj given action a
                     prob = int(prob)
                     self.P_a[si, a, sj] = prob
+                    if self.P_a[si, a, sj] != 1:
+                        print "prob is ", self.P_a[si, a, sj]
         return self.P_a
 
     def calc_value_for_state(self, s):
         value = max([sum(
-            [self.P_a[s, a, s1] * (self.rewards[s] + self.gamma * self.values_tmp[s1]) for s1 in range(self.n_states)])
+            [(self.rewards[s] + self.gamma * self.values_tmp[s1]) for s1 in range(self.n_states)])
                      for a in range(self.n_actions)])
+        # print "value of state is ", value
         return value, s
 
-    def value_iteration(self, rewards, error=0.001):
+    def value_iteration(self, rewards, error=0.01):
         # Initialize the value function
 
         values = np.zeros([self.n_states])
@@ -234,6 +239,8 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         # print "states range value is ", states_range_value
         self.rewards = rewards
         # estimate values
+        count = 0
+
         while True:
             # Temporary copy to check find the difference between new value function calculated & current value function
             # to ensure improvement in value
@@ -242,7 +249,9 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
             # t_value.tic()
             for q, s in self.map(self.calc_value_for_state, states_range_value):
                 values[s] = q
-                # print "\nvalues is ", values[s]
+                count += 1
+                if count%250 == 0:
+                    print "\nvalues is ", values[s]
             '''
             for s in range(self.n_states):
                 values[s] = max(
@@ -257,7 +266,7 @@ class RobotStateUtils(concurrent.futures.ThreadPoolExecutor):
         # generate deterministic policy
         policy = np.zeros([self.n_states])
         for s in range(self.n_states):
-            policy[s] = np.argmax([sum([self.P_a[s, a, s1] * (self.rewards[s] + self.gamma * values[s1])
+            policy[s] = np.argmax([sum([(self.rewards[s] + self.gamma * values[s1])
                                         for s1 in range(self.n_states)])
                                    for a in range(self.n_actions)])
 
@@ -301,6 +310,7 @@ if __name__ == '__main__':
     '''
     # Robot Object called
     # Pass the gridsize required
+    [0.02, 0.075, -0.09]
     weights = np.array([[1, 1, 0]])
     # term_state = np.random.randint(0, grid_size ** 3)]
     env_obj = RobotStateUtils(11, weights, 0.9, [0.5, 0.5, 0])

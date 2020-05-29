@@ -109,9 +109,9 @@ class MaxEntIRL:
         return policy, expected_svf
 
     def get_state_val_index(self, state_val):
-        index_val = abs((state_val[0] + 5) * pow(self.grid_size, 2)) + abs(
-            (state_val[1] + 5) * pow(self.grid_size, 1)) + \
-                    abs((state_val[2] + 5))
+        index_val = abs((state_val[0] + 0.025) / 0.005 * pow(self.grid_size, 2)) + \
+                    abs((state_val[1] - 0.025) / 0.005 * pow(self.grid_size, 1)) + \
+                    abs((state_val[2] + 0.14) / 0.005)
         return int(round(index_val))
 
 

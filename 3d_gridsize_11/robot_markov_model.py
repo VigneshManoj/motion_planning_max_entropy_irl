@@ -4,25 +4,37 @@ import numpy as np
 class RobotMarkovModel:
     def __init__(self):
         # Reads the trajectory data from the file
+        # trajectories1 = np.genfromtxt\
+        #     ("/home/vvarier/dvrk_automated_suturing/iros2020/suturing_grid3d_size11_data1/grid11_parallel/max_ent_grid11_data1.csv",
+        #      delimiter=",")
+        # trajectories1 = np.genfromtxt\
+        #     ("/home/vvarier/dvrk_automated_suturing/iros2020/RL_3d_gridsize_11/grid11_parallel/max_ent_grid11_data1.csv",
+        #      delimiter=",")
+        # trajectories3 = np.genfromtxt\
+        #     ("/home/vvarier/dvrk_automated_suturing/iros2020/suturing_grid3d_size11/grid11_parallel/max_ent_grid11_data3.csv",
+        #      delimiter=",")
         trajectories1 = np.genfromtxt\
-            ("/home/vvarier/dvrk_automated_suturing/max_ent_trial4_parallel_compute_grid_size/trial4_grid11_parallel/max_ent_grid11_data1.csv",
-             delimiter=",")
-        trajectories2 = np.genfromtxt\
-            ("/home/vvarier/dvrk_automated_suturing/max_ent_trial4_parallel_compute_grid_size/trial4_grid11_parallel/max_ent_grid11_data2.csv",
-             delimiter=",")
-        trajectories3 = np.genfromtxt\
-            ("/home/vvarier/dvrk_automated_suturing/max_ent_trial4_parallel_compute_grid_size/trial4_grid11_parallel/max_ent_grid11_data3.csv",
-             delimiter=",")
+           ("/home/vignesh/PycharmProjects/motion_planning_max_entropy_irl/RL_3d_gridsize_11/trial4_grid11_parallel/max_ent_grid11_data1.csv",
+            delimiter=",")
+        # trajectories1 = np.genfromtxt\
+        #     ("/home/vignesh/PycharmProjects/dvrk_automated_suturing/data/check_data_max_ent_trial3_code1.csv",
+        #      delimiter=",")
+        # trajectories2 = np.genfromtxt\
+        #     ("/home/vignesh/Thesis_Suture_data/trial2/suture_data_trial2/832953_edited.csv",
+        #      delimiter=",")
+        # trajectories3 = np.genfromtxt\
+        #     ("/home/vignesh/Thesis_Suture_data/trial2/suture_data_trial2/781266_edited.csv",
+        #      delimiter=",")
         # Separates the state trajectories data and action data
         self.state_trajectories = []
         self.state_trajectories.append(trajectories1[:, 0:3])
-        self.state_trajectories.append(trajectories2[:, 0:3])
-        self.state_trajectories.append(trajectories3[:, 0:3])
+        # self.state_trajectories.append(trajectories2[:, 0:3])
+        # self.state_trajectories.append(trajectories3[:, 0:3])
 
         self.action_trajectories = []
         self.action_trajectories.append(trajectories1[:, 3:6])
-        self.action_trajectories.append(trajectories2[:, 3:6])
-        self.action_trajectories.append(trajectories3[:, 3:6])
+        # self.action_trajectories.append(trajectories2[:, 3:6])
+        # self.action_trajectories.append(trajectories3[:, 3:6])
 
         # Initialize the actions possible
         self.action_set = []

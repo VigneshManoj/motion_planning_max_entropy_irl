@@ -1,0 +1,27 @@
+
+Traj 1
+Meanx = 2.85714
+meany = 1.42857
+meanz = 0.71428
+VarianceX = 11.90476
+VarianceY = 5.29100
+VarianceZ = 3.17460
+Distance = 0.14
+
+Traj 2
+Meanx = 2.85714
+meany = 1.42857
+meanz = 0.89285
+VarianceX = 11.90476
+VarianceY = 5.29100
+VarianceZ = 3.80291
+distance = 0.145
+
+Traj 3
+Meanx = 2.85714
+meany = 1.60714
+meanz = 0.714285
+VarianceX = 11.90476
+VarianceY = 5.65476
+VarianceZ = 3.17460
+distance = 0.145
